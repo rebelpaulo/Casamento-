@@ -1,165 +1,200 @@
 "use client"
 
 import { useState } from "react"
-import { Loader2, CheckCircle2, AlertCircle } from "lucide-react"
+import { OliveFlourish, HeartGlyph } from "@/components/decorations"
 
-type Status = { kind: "idle" } | { kind: "loading" } | { kind: "ok" } | { kind: "error"; msg: string }
+type State =
+  | { kind: "idle" }
+  | { kind: "submitting" }
+  | { kind: "success" }
+  | { kind: "error"; message: string }
 
 export function RsvpForm() {
-  const [status, setStatus] = useState<Status>({ kind: "idle" })
+  const [adults, setAdults] = useState(1)
+  const [children, setChildren] = useState(0)
+  const [state, setState] = useState<State>({ kind: "idle" })
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    setStatus({ kind: "loading" })
+    if (state.kind === "submitting") return
     const form = e.currentTarget
-    const fd = new FormData(form)
+    const data = new FormData(form)
     const payload = {
-      name: String(fd.get("name") ?? ""),
-      email: String(fd.get("email") ?? ""),
-      phone: String(fd.get("phone") ?? ""),
-      adults: Number(fd.get("adults") ?? 1),
-      children: Number(fd.get("children") ?? 0),
+      name: String(data.get("name") || "").trim(),
+      email: String(data.get("email") || "").trim().toLowerCase(),
+      phone: String(data.get("phone") || "").trim(),
+      adults,
+      children,
     }
 
+    setState({ kind: "submitting" })
     try {
       const res = await fetch("/api/register", {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       })
-      const data = await res.json().catch(() => ({}))
-      if (!res.ok) {
-        setStatus({ kind: "error", msg: data?.error ?? "Erro ao enviar pedido." })
+      const json = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string }
+      if (!res.ok || !json.ok) {
+        setState({ kind: "error", message: json.error || "Não foi possível enviar o pedido." })
         return
       }
-      setStatus({ kind: "ok" })
+      setState({ kind: "success" })
       form.reset()
+      setAdults(1)
+      setChildren(0)
     } catch {
-      setStatus({ kind: "error", msg: "Erro de rede. Tenta novamente." })
+      setState({ kind: "error", message: "Erro de rede. Tenta novamente." })
     }
   }
 
-  if (status.kind === "ok") {
+  if (state.kind === "success") {
     return (
-      <div className="rounded-lg border bg-card p-6 text-center">
-        <CheckCircle2 className="mx-auto mb-3 h-10 w-10 text-accent" aria-hidden />
-        <h3 className="font-serif text-2xl">Pedido enviado</h3>
-        <p className="mt-2 text-sm text-muted-foreground text-pretty">
-          Obrigado! Vamos rever o teu pedido e enviar-te uma confirmação por WhatsApp.
+      <div className="paper-card p-8 text-center">
+        <OliveFlourish className="mb-4" />
+        <h3 className="font-serif text-2xl italic text-primary">Pedido enviado</h3>
+        <p className="mt-3 italic text-foreground/80">
+          {"Recebemos o teu pedido. Vamos confirmar e enviar-te uma mensagem em breve."}
         </p>
         <button
           type="button"
-          onClick={() => setStatus({ kind: "idle" })}
-          className="mt-4 text-sm text-primary underline-offset-4 hover:underline"
+          onClick={() => setState({ kind: "idle" })}
+          className="mt-6 inline-flex items-center gap-2 text-sm italic text-accent underline-offset-4 hover:underline"
         >
-          Submeter outro pedido
+          <HeartGlyph className="h-3 w-3" />
+          enviar outro pedido
         </button>
       </div>
     )
   }
 
-  const loading = status.kind === "loading"
-
   return (
-    <form onSubmit={onSubmit} className="grid gap-4" noValidate>
-      <Field id="name" label="Nome">
-        <input
-          id="name"
-          name="name"
-          required
-          minLength={2}
-          maxLength={120}
-          autoComplete="name"
-          className="input"
-          placeholder="O teu nome completo"
-        />
+    <form onSubmit={onSubmit} className="space-y-5" noValidate>
+      <Field name="name" label="Nome" placeholder="Nome" autoComplete="name" required>
+        <UserIcon />
+      </Field>
+      <Field
+        name="email"
+        type="email"
+        label="E-mail"
+        placeholder="E-mail"
+        autoComplete="email"
+        required
+      >
+        <MailIcon />
+      </Field>
+      <Field name="phone" type="tel" label="Telefone" placeholder="Telefone" autoComplete="tel" required>
+        <PhoneIcon />
       </Field>
 
-      <Field id="email" label="Email">
-        <input
-          id="email"
-          name="email"
-          type="email"
-          required
-          maxLength={200}
-          autoComplete="email"
-          className="input"
-          placeholder="exemplo@email.com"
-        />
-      </Field>
-
-      <Field id="phone" label="Telefone (com indicativo)">
-        <input
-          id="phone"
-          name="phone"
-          required
-          inputMode="tel"
-          autoComplete="tel"
-          pattern="[+\d\s().-]{6,30}"
-          className="input"
-          placeholder="+351 912 345 678"
-        />
-      </Field>
-
-      <div className="grid grid-cols-2 gap-4">
-        <Field id="adults" label="Adultos">
-          <select id="adults" name="adults" defaultValue="1" className="input">
-            <option value="1">1</option>
-            <option value="2">2</option>
-          </select>
-        </Field>
-        <Field id="children" label="Crianças">
-          <select id="children" name="children" defaultValue="0" className="input">
-            <option value="0">0</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-          </select>
-        </Field>
+      <div className="flex items-center justify-between gap-4">
+        <span className="italic text-foreground/80">N.º de adultos</span>
+        <div className="flex gap-2">
+          {[1, 2].map((n) => (
+            <button
+              type="button"
+              key={n}
+              className="num-pill"
+              data-checked={adults === n}
+              aria-pressed={adults === n}
+              onClick={() => setAdults(n)}
+            >
+              {n}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {status.kind === "error" && (
-        <div role="alert" className="flex items-start gap-2 rounded-md border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
-          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
-          <span>{status.msg}</span>
+      <div className="flex items-center justify-between gap-4">
+        <span className="italic text-foreground/80">N.º de crianças</span>
+        <div className="flex gap-2">
+          {[0, 1, 2, 3].map((n) => (
+            <button
+              type="button"
+              key={n}
+              className="num-pill"
+              data-checked={children === n}
+              aria-pressed={children === n}
+              onClick={() => setChildren(n)}
+            >
+              {n}
+            </button>
+          ))}
         </div>
-      )}
+      </div>
+
+      {state.kind === "error" ? (
+        <p className="text-center text-sm italic text-accent">{state.message}</p>
+      ) : null}
 
       <button
         type="submit"
-        disabled={loading}
-        className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-5 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
+        disabled={state.kind === "submitting"}
+        className="w-full rounded-md bg-accent py-3 text-center text-base font-medium tracking-wide italic text-accent-foreground transition hover:opacity-95 disabled:opacity-60"
       >
-        {loading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : null}
-        {loading ? "A enviar..." : "Enviar pedido"}
+        {state.kind === "submitting" ? "A enviar..." : "Enviar pedido"}
       </button>
-
-      <style>{`
-        .input {
-          width: 100%;
-          background: var(--color-card);
-          border: 1px solid var(--color-border);
-          border-radius: var(--radius);
-          padding: 0.65rem 0.85rem;
-          font-size: 0.95rem;
-          color: var(--color-foreground);
-          outline: none;
-          transition: border-color 0.15s, box-shadow 0.15s;
-        }
-        .input:focus {
-          border-color: var(--color-ring);
-          box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-ring) 25%, transparent);
-        }
-      `}</style>
     </form>
   )
 }
 
-function Field({ id, label, children }: { id: string; label: string; children: React.ReactNode }) {
+function Field({
+  name,
+  label,
+  placeholder,
+  type = "text",
+  autoComplete,
+  required,
+  children,
+}: {
+  name: string
+  label: string
+  placeholder: string
+  type?: string
+  autoComplete?: string
+  required?: boolean
+  children: React.ReactNode
+}) {
   return (
-    <label htmlFor={id} className="grid gap-1.5">
-      <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</span>
-      {children}
+    <label className="block">
+      <span className="sr-only">{label}</span>
+      <span className="relative flex items-center">
+        <span className="pointer-events-none absolute left-3 text-primary/70" aria-hidden="true">
+          {children}
+        </span>
+        <input
+          name={name}
+          type={type}
+          placeholder={placeholder}
+          autoComplete={autoComplete}
+          required={required}
+          className="w-full rounded-md border border-border bg-card pl-10 pr-3 py-3 text-base italic text-foreground placeholder:text-foreground/50 focus:border-primary focus:outline-none focus:ring-1 focus:ring-ring"
+        />
+      </span>
     </label>
+  )
+}
+
+function UserIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-4 w-4">
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 21c0-4 3.5-7 8-7s8 3 8 7" strokeLinecap="round" />
+    </svg>
+  )
+}
+function MailIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-4 w-4">
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <path d="M3 7l9 7 9-7" />
+    </svg>
+  )
+}
+function PhoneIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-4 w-4">
+      <path d="M5 4h3l2 5-2 1a12 12 0 006 6l1-2 5 2v3a2 2 0 01-2 2A17 17 0 013 6a2 2 0 012-2z" strokeLinejoin="round" />
+    </svg>
   )
 }

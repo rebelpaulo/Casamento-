@@ -1,25 +1,35 @@
 @import "tailwindcss";
 
-@theme {
-  --color-background: oklch(0.98 0.01 80);
-  --color-foreground: oklch(0.25 0.02 30);
-  --color-muted: oklch(0.94 0.02 75);
-  --color-muted-foreground: oklch(0.48 0.02 35);
-  --color-card: oklch(1 0 0);
-  --color-card-foreground: oklch(0.25 0.02 30);
-  --color-border: oklch(0.88 0.02 70);
-  --color-input: oklch(0.92 0.02 75);
-  --color-ring: oklch(0.55 0.12 45);
+@theme inline {
+  --font-serif: var(--font-playfair), Georgia, "Times New Roman", serif;
+  --font-handwritten: var(--font-caveat), "Brush Script MT", cursive;
+  --font-sans: var(--font-playfair), Georgia, serif;
 
-  --color-primary: oklch(0.45 0.11 40);
-  --color-primary-foreground: oklch(0.98 0.01 80);
-  --color-accent: oklch(0.55 0.08 130);
-  --color-accent-foreground: oklch(0.98 0.01 80);
-  --color-destructive: oklch(0.5 0.2 25);
-  --color-destructive-foreground: oklch(0.98 0.01 80);
+  --color-background: #f3e9d2;
+  --color-foreground: #4a3a26;
+  --color-card: #fbf3df;
+  --color-card-foreground: #4a3a26;
+  --color-popover: #fbf3df;
+  --color-popover-foreground: #4a3a26;
 
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-cormorant), ui-serif, Georgia, serif;
+  --color-primary: #5b6b3a;
+  --color-primary-foreground: #fbf3df;
+
+  --color-secondary: #e8dcc1;
+  --color-secondary-foreground: #4a3a26;
+
+  --color-muted: #ece1c5;
+  --color-muted-foreground: #8a7a5c;
+
+  --color-accent: #b85440;
+  --color-accent-foreground: #fbf3df;
+
+  --color-destructive: #b85440;
+  --color-destructive-foreground: #fbf3df;
+
+  --color-border: #c9b896;
+  --color-input: #c9b896;
+  --color-ring: #5b6b3a;
 
   --radius: 0.5rem;
 }
@@ -28,17 +38,73 @@
   border-color: var(--color-border);
 }
 
-html, body {
-  background: var(--color-background);
+html,
+body {
+  background-color: var(--color-background);
   color: var(--color-foreground);
 }
 
 body {
-  font-family: var(--font-sans);
+  font-family: var(--font-serif);
   -webkit-font-smoothing: antialiased;
+  background-image:
+    radial-gradient(at 0% 0%, rgba(184, 84, 64, 0.07) 0px, transparent 55%),
+    radial-gradient(at 100% 100%, rgba(91, 107, 58, 0.07) 0px, transparent 55%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.29  0 0 0 0 0.23  0 0 0 0 0.15  0 0 0 0.06 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  background-attachment: fixed;
 }
 
-h1, h2, h3, .font-serif {
-  font-family: var(--font-serif);
-  letter-spacing: -0.01em;
+.font-handwritten {
+  font-family: var(--font-handwritten);
 }
+
+.dotted-rule {
+  border-top: 1px dashed var(--color-border);
+}
+
+.paper-card {
+  background-color: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow:
+    0 1px 0 rgba(74, 58, 38, 0.04),
+    0 24px 48px -32px rgba(74, 58, 38, 0.18);
+}
+
+.num-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: 9999px;
+  font-size: 0.95rem;
+  color: var(--color-foreground);
+  background: var(--color-card);
+  cursor: pointer;
+  transition: all 120ms ease;
+  user-select: none;
+}
+.num-pill:hover {
+  border-color: var(--color-primary);
+}
+.num-pill[data-checked="true"] {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-primary-foreground);
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.7rem;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+.status-pill--pendente { background: #f5d9b5; color: #6e4f1f; }
+.status-pill--aprovado { background: #d3dcb6; color: #4a5a2a; }
+.status-pill--rejeitado { background: #f0c4ba; color: #7a3024; }

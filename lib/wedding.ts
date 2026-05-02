@@ -100,3 +100,20 @@ export function buildWhatsAppUrl(phone: string, message: string): string {
   const digits = phone.replace(/\D/g, "")
   return `https://wa.me/${digits}?text=${encodeURIComponent(message)}`
 }
+
+/** Server-only lookup: is this email an APROVADO registration? */
+export async function getApprovedRegistrationByEmail(
+  email: string,
+): Promise<Registration | null> {
+  const admin = createAdminClient()
+  const { data, error } = await admin
+    .from("wedding_registrations")
+    .select("*")
+    .eq("email", email.trim().toLowerCase())
+    .eq("status", "APROVADO")
+    .order("updated_at", { ascending: false })
+    .limit(1)
+    .maybeSingle()
+  if (error) return null
+  return (data ?? null) as Registration | null
+}

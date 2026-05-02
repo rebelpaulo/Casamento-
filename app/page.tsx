@@ -1,112 +1,146 @@
+import Link from "next/link"
+import { redirect } from "next/navigation"
 import { getSettings } from "@/lib/wedding"
 import { formatEventDate } from "@/lib/format"
 import { RsvpForm } from "@/components/rsvp-form"
-import { MapPin, Clock, Hotel, Shirt, ExternalLink } from "lucide-react"
+import { GuestLoginForm } from "@/components/guest-login-form"
+import { getGuestSession } from "@/lib/guest-auth"
+import {
+  HeartDivider,
+  HeartGlyph,
+  OliveFlourish,
+  ScallopWave,
+  CornerSpray,
+} from "@/components/decorations"
 
 export const dynamic = "force-dynamic"
 
 export default async function HomePage() {
+  const session = await getGuestSession()
+  if (session) redirect("/info")
+
   const s = await getSettings()
   const dateLabel = formatEventDate(s.event_date)
 
   return (
-    <main className="mx-auto max-w-5xl px-6 py-10 md:py-16">
-      <header className="text-center">
-        <p className="text-xs font-medium uppercase tracking-[0.25em] text-muted-foreground">
-          {dateLabel}
-        </p>
-        <h1 className="mt-4 text-balance font-serif text-4xl leading-tight md:text-6xl">
+    <main className="mx-auto flex w-full max-w-md flex-col gap-10 px-5 py-10 md:max-w-2xl md:gap-14 md:py-16">
+      {/* HERO */}
+      <section
+        aria-labelledby="hero-title"
+        className="paper-card relative overflow-hidden p-8 text-center md:p-12"
+      >
+        <CornerSpray position="top-left" className="absolute left-2 top-2" />
+        <CornerSpray position="top-right" className="absolute right-2 top-2" />
+
+        <p className="font-handwritten text-2xl text-accent/80">{dateLabel}</p>
+
+        <h1
+          id="hero-title"
+          className="mt-2 text-balance font-serif text-4xl italic leading-tight text-primary md:text-5xl"
+        >
           {s.welcome_title}
         </h1>
-        <p className="mt-4 font-serif text-2xl text-primary md:text-3xl">{s.couple_names}</p>
-        <p className="mx-auto mt-4 max-w-xl text-pretty text-base text-muted-foreground md:text-lg">
+
+        <p className="mt-5 font-serif text-2xl italic text-accent md:text-3xl">
+          {s.couple_names}
+        </p>
+
+        <OliveFlourish className="mt-6" />
+
+        <p className="mx-auto mt-5 max-w-sm text-pretty text-base italic leading-relaxed text-foreground/80 md:text-lg">
           {s.welcome_subtitle}
         </p>
-      </header>
 
-      <div className="mt-12 grid gap-8 md:grid-cols-5">
-        <section
-          aria-labelledby="rsvp-title"
-          className="md:col-span-3 rounded-xl border bg-card p-6 shadow-sm md:p-8"
-        >
-          <h2 id="rsvp-title" className="font-serif text-2xl md:text-3xl">
-            Foste convidado? Confirma a tua presença
+        <div className="mt-9 flex flex-col items-stretch gap-3">
+          <a
+            href="#login"
+            className="rounded-md bg-primary py-3 text-center text-base font-medium italic text-primary-foreground transition hover:opacity-95"
+          >
+            Fui convidado, quero entrar
+          </a>
+          <a
+            href="#rsvp"
+            className="rounded-md border border-accent bg-transparent py-3 text-center text-base font-medium italic text-accent transition hover:bg-accent/5"
+          >
+            Quero fazer o RSVP
+          </a>
+        </div>
+
+        <ScallopWave className="mt-10" />
+
+        <p className="mt-6 inline-flex items-center gap-2 font-handwritten text-lg text-foreground/70">
+          <LockGlyph />
+          Este site é apenas para convidados aprovados.
+        </p>
+      </section>
+
+      {/* RSVP */}
+      <section id="rsvp" aria-labelledby="rsvp-title" className="paper-card p-7 md:p-10">
+        <header className="text-center">
+          <h2
+            id="rsvp-title"
+            className="text-balance font-serif text-3xl italic text-accent md:text-4xl"
+          >
+            Quero confirmar a minha presença
           </h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Preenche o formulário. Vamos rever o pedido e confirmar contigo por WhatsApp.
+          <OliveFlourish className="mt-4" />
+        </header>
+        <div className="mt-7">
+          <RsvpForm />
+        </div>
+      </section>
+
+      {/* GUEST LOGIN */}
+      <section
+        id="login"
+        aria-labelledby="login-title"
+        className="paper-card p-7 md:p-10"
+      >
+        <HeartDivider />
+        <header className="mt-6 text-center">
+          <h2
+            id="login-title"
+            className="font-serif text-2xl italic text-primary md:text-3xl"
+          >
+            Convidado aprovado?
+          </h2>
+          <p className="mt-2 italic text-foreground/70">
+            Introduz o teu e-mail para entrar
           </p>
-          <div className="mt-6">
-            <RsvpForm />
-          </div>
-        </section>
+        </header>
+        <div className="mt-6">
+          <GuestLoginForm />
+        </div>
+        <p className="mt-5 text-center text-sm italic text-foreground/60">
+          {"Ainda não tens convite? "}
+          <a href="#rsvp" className="text-accent underline-offset-4 hover:underline">
+            faz o RSVP
+          </a>
+          .
+        </p>
+      </section>
 
-        <aside className="md:col-span-2 grid gap-4 content-start">
-          <InfoCard icon={<MapPin className="h-5 w-5" aria-hidden />} title="Local">
-            <p className="font-medium">{s.venue_name}</p>
-            <p className="text-sm text-muted-foreground">{s.venue_address}</p>
-            <a
-              href={s.map_url}
-              target="_blank"
-              rel="noreferrer noopener"
-              className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline underline-offset-4"
-            >
-              Ver no mapa <ExternalLink className="h-3.5 w-3.5" aria-hidden />
-            </a>
-          </InfoCard>
-
-          <InfoCard icon={<Clock className="h-5 w-5" aria-hidden />} title="Programa">
-            <ul className="grid gap-2 text-sm">
-              {s.timeline.map((t, i) => (
-                <li key={i} className="flex items-baseline gap-3">
-                  <span className="font-mono text-xs font-semibold text-primary tabular-nums">{t.time}</span>
-                  <span className="text-foreground">{t.label}</span>
-                </li>
-              ))}
-            </ul>
-          </InfoCard>
-
-          <InfoCard icon={<Shirt className="h-5 w-5" aria-hidden />} title="Dress code">
-            <p className="text-sm text-muted-foreground text-pretty">{s.dress_code}</p>
-          </InfoCard>
-
-          {s.hotels.length > 0 && (
-            <InfoCard icon={<Hotel className="h-5 w-5" aria-hidden />} title="Onde dormir">
-              <ul className="grid gap-1.5 text-sm">
-                {s.hotels.map((h, i) => (
-                  <li key={i} className="flex items-baseline justify-between gap-3">
-                    <span className="text-foreground">{h.name}</span>
-                    <span className="text-xs text-muted-foreground">{h.distance}</span>
-                  </li>
-                ))}
-              </ul>
-            </InfoCard>
-          )}
-        </aside>
-      </div>
-
-      <footer className="mt-16 border-t pt-8 text-center text-xs text-muted-foreground">
-        <p>Feito com carinho para {s.couple_names}.</p>
+      <footer className="flex flex-col items-center gap-2 pb-4 text-center">
+        <HeartGlyph className="h-3 w-3 text-accent/60" />
+        <p className="font-handwritten text-lg text-foreground/60">
+          {`feito com carinho para ${s.couple_names.toLowerCase()}`}
+        </p>
+        <Link
+          href="/admin/login"
+          className="mt-2 text-xs italic text-foreground/40 underline-offset-4 hover:underline"
+        >
+          área dos noivos
+        </Link>
       </footer>
     </main>
   )
 }
 
-function InfoCard({
-  icon,
-  title,
-  children,
-}: {
-  icon: React.ReactNode
-  title: string
-  children: React.ReactNode
-}) {
+function LockGlyph() {
   return (
-    <div className="rounded-xl border bg-card p-5 shadow-sm">
-      <div className="mb-3 flex items-center gap-2 text-primary">
-        {icon}
-        <h3 className="font-serif text-lg">{title}</h3>
-      </div>
-      {children}
-    </div>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-4 w-4">
+      <rect x="5" y="11" width="14" height="9" rx="2" />
+      <path d="M8 11V8a4 4 0 018 0v3" />
+    </svg>
   )
 }

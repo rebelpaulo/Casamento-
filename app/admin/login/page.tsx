@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
 import { isAdminAuthenticated, verifyCredentials, createAdminSession } from "@/lib/admin-auth"
-import { Lock } from "lucide-react"
+import { OliveFlourish } from "@/components/decorations"
 
 export const dynamic = "force-dynamic"
 
@@ -24,26 +24,33 @@ export default async function AdminLoginPage({
   const { error } = await searchParams
 
   return (
-    <main className="grid min-h-dvh place-items-center px-6 py-10">
-      <div className="w-full max-w-sm rounded-xl border bg-card p-8 shadow-sm">
-        <div className="mb-6 flex items-center gap-2 text-primary">
-          <Lock className="h-5 w-5" aria-hidden />
-          <h1 className="font-serif text-2xl">Acesso Admin</h1>
-        </div>
-        <form action={loginAction} className="grid gap-4">
-          <label className="grid gap-1.5">
-            <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+    <main className="grid min-h-dvh place-items-center px-5 py-10">
+      <div className="paper-card w-full max-w-sm p-8">
+        <header className="text-center">
+          <div className="mx-auto inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-5 w-5">
+              <rect x="5" y="11" width="14" height="9" rx="2" />
+              <path d="M8 11V8a4 4 0 018 0v3" />
+            </svg>
+          </div>
+          <h1 className="mt-3 font-serif text-2xl italic text-primary">Área dos noivos</h1>
+          <OliveFlourish className="mt-3" />
+        </header>
+
+        <form action={loginAction} className="mt-6 space-y-4">
+          <label className="block">
+            <span className="mb-1 block text-xs italic uppercase tracking-wider text-foreground/60">
               Utilizador
             </span>
             <input
               name="user"
               required
               autoComplete="username"
-              className="rounded-md border bg-background px-3 py-2.5 text-sm outline-none focus:border-ring"
+              className="w-full rounded-md border border-border bg-card px-3 py-2.5 italic text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-ring"
             />
           </label>
-          <label className="grid gap-1.5">
-            <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          <label className="block">
+            <span className="mb-1 block text-xs italic uppercase tracking-wider text-foreground/60">
               Palavra-passe
             </span>
             <input
@@ -51,17 +58,17 @@ export default async function AdminLoginPage({
               type="password"
               required
               autoComplete="current-password"
-              className="rounded-md border bg-background px-3 py-2.5 text-sm outline-none focus:border-ring"
+              className="w-full rounded-md border border-border bg-card px-3 py-2.5 italic text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-ring"
             />
           </label>
           {error ? (
-            <p role="alert" className="text-sm text-destructive">
+            <p role="alert" className="text-center text-sm italic text-accent">
               Credenciais inválidas.
             </p>
           ) : null}
           <button
             type="submit"
-            className="rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+            className="w-full rounded-md bg-primary px-4 py-2.5 text-base italic text-primary-foreground transition hover:opacity-95"
           >
             Entrar
           </button>

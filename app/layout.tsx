@@ -1,44 +1,40 @@
 import type { Metadata, Viewport } from "next"
-import { Inter, Cormorant_Garamond } from "next/font/google"
+import { Playfair_Display, Caveat } from "next/font/google"
 import "./globals.css"
 
-const inter = Inter({
+const playfair = Playfair_Display({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-playfair",
+  style: ["normal", "italic"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 })
 
-const cormorant = Cormorant_Garamond({
+const caveat = Caveat({
   subsets: ["latin"],
+  variable: "--font-caveat",
   weight: ["400", "500", "600", "700"],
-  variable: "--font-cormorant",
   display: "swap",
 })
 
 export const metadata: Metadata = {
-  title: "Paulo & Mória — Convite",
-  description: "Convite para a festa que nos aconteceu. Junta-te a nós.",
-  openGraph: {
-    title: "Paulo & Mória — Convite",
-    description: "Convite para a festa que nos aconteceu.",
-    type: "website",
-  },
+  title: "Paulo + Mória — A festa que nos aconteceu",
+  description:
+    "Convite privado para a renovação de votos do Paulo e da Mória. Junta-te a nós num dia de celebração, amor e memórias.",
 }
 
 export const viewport: Viewport = {
-  themeColor: "#f5efe4",
+  themeColor: "#f3e9d2",
   width: "device-width",
   initialScale: 1,
 }
 
 export default function RootLayout({
   children,
-}: {
-  children: React.ReactNode
-}) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="pt" className={`${inter.variable} ${cormorant.variable} bg-background`}>
-      <body className="min-h-dvh font-sans antialiased">{children}</body>
+    <html lang="pt-PT" className={`${playfair.variable} ${caveat.variable} bg-background`}>
+      <body className="min-h-dvh font-serif antialiased text-foreground">{children}</body>
     </html>
   )
 }
