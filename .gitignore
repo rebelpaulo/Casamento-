@@ -1,0 +1,27 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# next
+.next/
+out/
+
+# build
+build/
+dist/
+
+# env
+.env
+.env.local
+.env.*.local
+
+# data (legacy json store)
+data/
+
+# misc
+.DS_Store
+*.pem
+.vercel
+*.tsbuildinfo
+next-env.d.ts
