@@ -1,15 +1,34 @@
-# Casamento - Next.js
+# Landing Page de Casamento (Paulo Silva + Mória Neto)
 
-Aplicação web de casamento com:
-- Página pública de RSVP
-- Dashboard admin
-- API route de guest login com rate limit
-- Persistência local em `data/db.json`
+## Funcionalidades
+- Página pública com formulário RSVP (nome, email, telefone, adultos 1-2, crianças 0-3).
+- Dashboard admin protegido por Basic Auth:
+  - user: `paulimoria`
+  - pass: `morianeto`
+- Aprovação/rejeição de pedidos.
+- Ao aprovar: gera link de WhatsApp (`wa.me`) para abrir no computador e enviar manualmente ao número configurado (`+351916989048`) com link do grupo.
+- Configuração completa no admin via JSON (morada, hotéis, horário, dress code etc.).
+- Persistência em ficheiro JSON (`data/db.json`) como solução temporária até ligar base de dados real.
 
-## Fix aplicado
-Foi corrigida a assinatura de `rateLimit` no endpoint `app/api/guest-login/route.ts`, removendo o segundo argumento para compatibilidade com a função utilitária tipada atual.
+## Segurança e boas práticas implementadas
+- Separação de área pública/admin.
+- Validação de payload RSVP no backend.
+- Credenciais e links sensíveis configuráveis por variáveis de ambiente.
 
-## Scripts
-- `pnpm dev`
-- `pnpm build`
-- `pnpm start`
+## Variáveis de ambiente
+- `PORT` (default `3000`)
+- `ADMIN_USER` (default `paulimoria`)
+- `ADMIN_PASS` (default `morianeto`)
+- `WHATSAPP_NUMBER` (default `+351916989048`)
+- `WHATSAPP_GROUP_LINK` (default placeholder)
+- `DB_PATH` (default `./data/db.json`)
+
+## Executar
+```bash
+npm start
+```
+
+## Testes
+```bash
+npm test
+```
