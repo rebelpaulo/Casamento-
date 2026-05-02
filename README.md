@@ -1,29 +1,34 @@
-# Casamento - Next.js
+# Landing Page de Casamento (Paulo Silva + Mória Neto)
 
-Aplicação web de casamento com:
-- Página pública de RSVP
-- Dashboard admin
-- API route de guest login com rate limit
-- Persistência local em `data/db.json`
+## Funcionalidades
+- Página pública com formulário RSVP (nome, email, telefone, adultos 1-2, crianças 0-3).
+- Dashboard admin protegido por Basic Auth:
+  - user: `paulimoria`
+  - pass: `morianeto`
+- Aprovação/rejeição de pedidos.
+- Ao aprovar: gera link de WhatsApp (`wa.me`) para abrir no computador e enviar manualmente ao número configurado (`+351916989048`) com link do grupo.
+- Configuração completa no admin via JSON (morada, hotéis, horário, dress code etc.).
+- Persistência em ficheiro JSON (`data/db.json`) como solução temporária até ligar base de dados real.
 
-## Deploy (Vercel)
-- `next` está definido em `dependencies`.
-- `vercel-build` foi adicionado para forçar build explícito com Next.
-- `vercel.json` define `framework: nextjs` e `buildCommand`.
+## Segurança e boas práticas implementadas
+- Separação de área pública/admin.
+- Validação de payload RSVP no backend.
+- Credenciais e links sensíveis configuráveis por variáveis de ambiente.
 
-## Scripts
-- `npm run dev`
-- `npm run build`
-- `npm run vercel-build`
-- `npm run start`
+## Variáveis de ambiente
+- `PORT` (default `3000`)
+- `ADMIN_USER` (default `paulimoria`)
+- `ADMIN_PASS` (default `morianeto`)
+- `WHATSAPP_NUMBER` (default `+351916989048`)
+- `WHATSAPP_GROUP_LINK` (default placeholder)
+- `DB_PATH` (default `./data/db.json`)
 
+## Executar
+```bash
+npm start
+```
 
-## Deploy na Vercel (estado atual)
-
-Esta repo está configurada para deploy como **Next.js** via `vercel.json`:
-- `framework: nextjs`
-- `installCommand: npm install`
-- `buildCommand: npm run vercel-build`
-- `outputDirectory: .next`
-
-Se a Vercel voltar a mostrar "No Next.js version detected", confirme no projeto Vercel que o **Root Directory** aponta para a pasta raiz desta repo (onde está o `package.json`).
+## Testes
+```bash
+npm test
+```
